@@ -1,11 +1,11 @@
 ---
 title: "Disease model for rhythm control strategies in symptomatic AF patients"
 author: "Simone Huygens and Matthijs Versteegh on behalf of Zorginstituut Nederland"
-date: '2025-05-07'
+date: '2025-08-12'
 output: word_document
 ---
 
-For more information on the input parameters and methods, we refer to the technical report.
+For more information on the input parameters and methods, we refer to the technical report or scienfitif manuscript.
 
 # 01 Settings and load required packages, functions and data
 
@@ -49,8 +49,8 @@ n_states           <- n_s <- length(v_n)           # the number of health states
 wtp                <- 20000                        # willingness to pay threshold (based on proportional shortfall AF)
 d_rc               <- 0.030                        # discount rate costs
 d_re               <- 0.015                        # discount rate effects
-d_rc               <- (1+d_rc)^cl-1                # discount rate costs to x-weekly 
-d_re               <- (1+d_re)^cl-1                # discount rate effects to x-weekly 
+d_rc               <- (1+d_rc)^cl-1                # discount rate costs to cycle length
+d_re               <- (1+d_re)^cl-1                # discount rate effects to cycle length
 v_dwc              <- 1 / ((1 + d_rc) ^ (0:n_t))   # per period discount weight costs
 v_dwe              <- 1 / ((1 + d_re) ^ (0:n_t))   # per period discount weight effects
 v_wcc              <- darthtools::gen_wcc(n_cycles = n_t, method = "Simpson1/3")  # within-cycle correction (WCC) 
@@ -102,9 +102,9 @@ load(here::here("input", "meta-analyse disc_AAD.RData"))
 RR_nai                 <- exp(predrema1$pred) # 1.76 95% CI 1.34-2.32. Patients naive to AAD and CA, i.e. first line. 
 RR_AAD_exp_parox       <- exp(predrema2$pred) # 2.32 95% CI 1.78-3.01. Patients with paroxysmal AF exposed to AAD but naive to CA
 RR_AAD_exp_pers        <- exp(predrema3$pred) # 1.62 95% CI 1.4-1.87.  Patients with persistent AF exposed to AAD but naive to CA
-RR_CA_exp              <-  2.12 # CI 1.61-2.80, based on 1 study. Patients exposed to CA and naive or exposed to AAD.
+RR_CA_exp              <- 2.12 # CI 1.61-2.80, based on 1 study. Patients exposed to CA and naive or exposed to AAD.
 
-# Probability of recurrence of AF after CA after 1 year 
+# Probability of recurrence of AF after CA after 1 year (Source: meta-analysis Cochrane Nederland and Vektis) 
 prop_AF_CA_nai           <- plogis(predrema1i$pred) # 0.18 CI 0.08-0.35. After 1st CA in AAD/CA naive patients (Source: meta-analysis)
 prop_AF_CA_AAD_exp_parox <- plogis(predrema2i$pred) # 0.26 CI 0.18-0.36. After 1st CA in AAD exposed paroxysmal AF patients (Source: meta-analysis)
 prop_AF_CA_AAD_exp_pers  <- plogis(predrema3i$pred) # 0.38 CI 0.33-0.42. After 1st CA in AAD exposed persistent AF patients. (Source: meta-analysis)
@@ -2408,7 +2408,7 @@ write.csv(idbc, file = here::here("output", "iDBC_input_noCA_sequence.csv"))
 
 ```
 
-### Cost-effectiveness planes (CE-plane) and cost-effectiveness acceptability curves (CEAC)
+## 06.5 Cost-effectiveness planes (CE-plane) and cost-effectiveness acceptability curves (CEAC)
 #### Most CE versus only AADs
 ```{r}
 df_psa1 <- psa_seq_results_vsAAD[psa_seq_results_vsAAD$treatment == "CA-AAD-AAD-AAD-AAD-CA",] 
@@ -2748,7 +2748,7 @@ sum(df_psa7$iNHB[df_psa7$CA_timing == "No CA" ]> 0) / length(df_psa7$iNHB[df_psa
 
 ```
 
-# 0.9.6 Value of information analysis & population impact
+## 06.6 Value of information analysis & population impact
 ```{R}
 knitr::opts_chunk$set(eval = FALSE)
 #In this section we first create a new data frame of the PSA results that can be read by the calc_evpi package of dampack
