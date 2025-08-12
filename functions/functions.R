@@ -72,75 +72,76 @@ plot_trace_line <- function(m_L)
 }
 
 
-# #### Fit multiple functional forms to survival data ####
-# # without generalized gamma density function because it is defined using an incomplete gamma in the denominator and when the values of the parameters 
-# # approach the extreme values (e.g. close to 0) then the function fails"
-# 
-# fit.fun <- function(time, status, data = data , add = FALSE, extrapolate = FALSE, times)  
-# {
-#   #Extract the right data columns 
-#   data$time   <-   data[,   time]  
-#   data$status <-   data[, status]  
-# 
-#     if (extrapolate == TRUE)  {
-#     plot.times <- max(times)
-#   } else if  (extrapolate == FALSE) {
-#     plot.times <- max(data$time)
-#   }
-#   
-#   # Progression free survival  
-#   KM.fit     <-     survfit(Surv(time, status) ~ 1, data = data)                         # fit Kaplan-Meier curve 
-#   fit.llogis <- flexsurvreg(Surv(time, status) ~ 1, data = data, dist = "llogis" )       # fit model with loglogistic distribution
-#   fit.weib   <- flexsurvreg(Surv(time, status) ~ 1, data = data, dist = "weibull")       # fit model with Weibull distribution
-#   fit.lnorm  <- flexsurvreg(Surv(time, status) ~ 1, data = data, dist = "lnorm"  )       # fit model with lognormal distribution
-#   fit.gamma  <- flexsurvreg(Surv(time, status) ~ 1, data = data, dist = "gamma"  )       # fit model with gamma distribution 
-#   fit.exp    <- flexsurvreg(Surv(time, status) ~ 1, data = data, dist = "exp"    )       # fit model with exponential distribution
-#   fit.gompertz  <- flexsurvreg(Surv(time, status) ~ 1, data = data, dist = "gompertz"  ) # fit model with gompertz  
-#   fit.rps    <- flexsurvspline(Surv(time, status) ~ 1, data = data, k = 2  ) # fit model with splines  )
-#   
-#   # extarapolate all models beyond the KM curve
-#   if(add){ lines(KM.fit, ylab = "Survival Probability", xlab = "Time", ylim = c(0,1), xlim = c(0, plot.times), conf.int= F)}
-#   if(!add){ plot(KM.fit, ylab = "Survival Probability", xlab = "Time", ylim = c(0,1), xlim = c(0, plot.times), conf.int= F, mark.time= T)}
-#   lines(fit.llogis,   t = times, col = 2, ci = F)
-#   lines(fit.weib,     t = times, col = 3, ci = F)
-#   lines(fit.lnorm,    t = times, col = 4, ci = F)
-#   lines(fit.gamma,    t = times, col = 5, ci = F)
-#   lines(fit.exp,      t = times, col = 6, ci = F)
-#   lines(fit.gompertz, t = times, col = 7, ci = F)
-#   lines(fit.rps,      t = times, col = 8, ci = F)
-#   legend("topright", cex = 0.7, c("Kaplan-Meier", "Loglogistic", "Weibull", "Lognormal", "Gamma", "Exponential", "Gompertz", "rps"), col = 1:8, lty = rep(1, 9), bty="n")
-#   
-#   # compare AIC values
-#   AIC <- c(    Loglogistic = AIC(fit.llogis),                                         
-#                Weibull     = AIC(fit.weib), 
-#                Lognormal   = AIC(fit.lnorm), 
-#                Gamma       = AIC(fit.gamma),
-#                Exponential = AIC(fit.exp),
-#              Gompertz = AIC(fit.gompertz),
-#              Rps = AIC(fit.rps))
-#               
-#   AIC= round(AIC,3)
-#   
-#   # compare BIC values
-#   BIC <- c(    Loglogistic = BIC(fit.llogis),                                         
-#                Weibull     = BIC(fit.weib), 
-#                Lognormal   = BIC(fit.lnorm), 
-#                Gamma       = BIC(fit.gamma),
-#                Exponential = BIC(fit.exp),
-#                Gompertz    = BIC(fit.gompertz),
-#                Rps = BIC(fit.rps))
-#   
-#   BIC <- round(BIC,3)
-#   
-#   res <- list(Loglogistic = fit.llogis,
-#               Weibull     = fit.weib,
-#               Lognormal   = fit.lnorm, 
-#               Gamma       = fit.gamma,
-#               Exponential = fit.exp, 
-#               Gompertz   = fit.gompertz,
-#               Rps        = fit.rps,
-#               AIC         = AIC,
-#               BIC         = BIC)
-#   res
-# }
-# 
+## Function to fit multiple functional forms to survival data
+# without GenGamma: Reaction DARTH workgroup on GenGamma: "We removed it because the implementation in R is a bit buggy. 
+# Generalized gamma density function is defined using an incomplete gamma in the denominator and when the values of the parameters 
+# approach the extreme values (e.g. close to 0) then the function fails"
+
+
+fit.fun <- function(time, status, data = data , add = FALSE, extrapolate = FALSE, times)  
+{
+  #Extract the right data columns 
+  data$time   <-   data[,   time]  
+  data$status <-   data[, status]  
+  
+  if (extrapolate == TRUE)  {
+    plot.times <- max(times)
+  } else if  (extrapolate == FALSE) {
+    plot.times <- max(data$time)
+  }
+  
+  # Progression free survival  
+  KM.fit     <-     survfit(Surv(time, status) ~ 1, data = data)                         # fit Kaplan-Meier curve 
+  fit.llogis <- flexsurvreg(Surv(time, status) ~ 1, data = data, dist = "llogis" )       # fit model with loglogistic distribution
+  fit.weib   <- flexsurvreg(Surv(time, status) ~ 1, data = data, dist = "weibull")       # fit model with Weibull distribution
+  fit.lnorm  <- flexsurvreg(Surv(time, status) ~ 1, data = data, dist = "lnorm"  )       # fit model with lognormal distribution
+  fit.gamma  <- flexsurvreg(Surv(time, status) ~ 1, data = data, dist = "gamma"  )       # fit model with gamma distribution 
+  fit.exp    <- flexsurvreg(Surv(time, status) ~ 1, data = data, dist = "exp"    )       # fit model with exponential distribution
+  fit.gompertz  <- flexsurvreg(Surv(time, status) ~ 1, data = data, dist = "gompertz"  ) # fit model with gompertz  
+  fit.rps    <- flexsurvspline(Surv(time, status) ~ 1, data = data, k = 2  ) # fit model with splines  )
+  
+  # extarapolate all models beyond the KM curve
+  if(add){ lines(KM.fit, ylab = "Survival Probability", xlab = "Time", ylim = c(0,1), xlim = c(0, plot.times), conf.int= F)}
+  if(!add){ plot(KM.fit, ylab = "Survival Probability", xlab = "Time", ylim = c(0,1), xlim = c(0, plot.times), conf.int= F, mark.time= T)}
+  lines(fit.llogis,   t = times, col = 2, ci = F)
+  lines(fit.weib,     t = times, col = 3, ci = F)
+  lines(fit.lnorm,    t = times, col = 4, ci = F)
+  lines(fit.gamma,    t = times, col = 5, ci = F)
+  lines(fit.exp,      t = times, col = 6, ci = F)
+  lines(fit.gompertz, t = times, col = 7, ci = F)
+  lines(fit.rps,      t = times, col = 8, ci = F)
+  legend("topright", cex = 0.7, c("Kaplan-Meier", "Loglogistic", "Weibull", "Lognormal", "Gamma", "Exponential", "Gompertz", "rps"), col = 1:8, lty = rep(1, 9), bty="n")
+  
+  # compare AIC values
+  AIC <- c(    Loglogistic = AIC(fit.llogis),                                         
+               Weibull     = AIC(fit.weib), 
+               Lognormal   = AIC(fit.lnorm), 
+               Gamma       = AIC(fit.gamma),
+               Exponential = AIC(fit.exp),
+               Gompertz = AIC(fit.gompertz),
+               Rps = AIC(fit.rps))
+  
+  AIC= round(AIC,3)
+  
+  # compare BIC values
+  BIC <- c(    Loglogistic = BIC(fit.llogis),                                         
+               Weibull     = BIC(fit.weib), 
+               Lognormal   = BIC(fit.lnorm), 
+               Gamma       = BIC(fit.gamma),
+               Exponential = BIC(fit.exp),
+               Gompertz    = BIC(fit.gompertz),
+               Rps = BIC(fit.rps))
+  
+  BIC <- round(BIC,3)
+  
+  res <- list(Loglogistic = fit.llogis,
+              Weibull     = fit.weib,
+              Lognormal   = fit.lnorm, 
+              Gamma       = fit.gamma,
+              Exponential = fit.exp, 
+              Gompertz   = fit.gompertz,
+              Rps        = fit.rps,
+              AIC         = AIC,
+              BIC         = BIC)
+  res
+}

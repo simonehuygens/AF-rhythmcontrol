@@ -8,10 +8,12 @@ library(here)
 library(pacman)
 library(tidyr)
 p_load_gh("DARTH-git/darthtools")
-source(here::here("functions", "functions.R"))
 
 rm(list = ls())
 options(scipen = 999)
+
+source(here::here("functions", "functions.R"))
+
 df <- read.csv(here::here("input", "KA_TTE_20250417.csv"), sep = ",", header = TRUE)
 colnames(df) <- c("verz_nr_","KA_n", "dag_KA_n", "jr_KA_n", "type_z", "jr_z", "event", "dgn_na_KA_1", "dgn_na_KA_n", "jr_na_KA_n", "sel_90_d")
 

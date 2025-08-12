@@ -171,10 +171,10 @@ n_tot_CT_CA     <- 6150
 p_CT_CA         <- n_CT_CA/n_tot_CT_CA
 n_PP_CA         <- 25   # phrenicus paralysis
 n_tot_PP_CA     <- 6211
-p_PP_CA         <- n_PP_CA/n_tot_PP_CA 
+p_PP_CA         <- n_PP_CA/n_tot_PP_CA
 n_VC_CA         <- 40   # vascular complications
 n_tot_VC_CA     <- 6149
-p_VC_CA         <- n_VC_CA/n_tot_VC_CA 
+p_VC_CA         <- n_VC_CA/n_tot_VC_CA
 
 #### COST INPUTS ####
 
@@ -937,18 +937,35 @@ PSA         <- F
 mainresults <- F 
 
 # Identify the desired sequence using TRT1 to TRT6. Treatment options are catheter ablation "CA" or anti-arrhythmic drugs "AAD".
-outcomes <- MicroSim(l_params, n_i, df_X, TRT1 = "AAD", TRT2 = "CA", TRT3 = "AAD", TRT4 = "AAD", TRT5 = "AAD", TRT6 = "CA", seed = 1)
+outcomes <- MicroSim(l_params, n_i, df_X, TRT1 = "CA", TRT2 = "AAD", TRT3 = "AAD", TRT4 = "AAD", TRT5 = "AAD", TRT6 = "CA", seed = 1)
 
-outcomes$te_hat         # Mean lifetime discounted QALYs
-outcomes$tc_hat         # Mean lifetime discounted costs
+results_ce1 <- t(data.frame(Cost               = outcomes$tc_hat,
+                            QALYs              = outcomes$te_hat,
+                            LYs                = outcomes$tLY_hat,
+                            LYs_undiscounted   = outcomes$tLY_undisc_hat,
+                            Time_in_line1      = outcomes$t_L1,
+                            Time_in_line2      = outcomes$t_L2,
+                            Time_in_line3      = outcomes$t_L3,
+                            Time_in_line4      = outcomes$t_L4,
+                            Time_in_line5      = outcomes$t_L5,
+                            Time_in_line6      = outcomes$t_L6,
+                            Time_discontinued  = outcomes$t_noTrt,
+                            Prop_in_line1      = outcomes$p_L1,
+                            Prop_in_line2      = outcomes$p_L2, 
+                            Prop_in_line3      = outcomes$p_L3,
+                            Prop_in_line4      = outcomes$p_L4,
+                            Prop_in_line5      = outcomes$p_L5, 
+                            Prop_in_line6      = outcomes$p_L6, 
+                            Prop_discontinued  = outcomes$p_noTrt)
+)
+results_ce1
 
 # # Check if everyone died at the end of the simulation (should be equal to n_i)
 # table(outcomes$m_M[,n_t+1])
-# 
+
 # Plot health state and line membership over time
 plot_m_TR(outcomes$m_M)
 plot_trace_line(outcomes$m_L)
-
 
 ```
 
