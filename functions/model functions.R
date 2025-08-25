@@ -236,15 +236,14 @@ Create_df_X <- function(l_params){
     v_CA_exp_1 <- rep(0, n_i)  # Exposed to CA
     v_CA_exp_2 <- rep(0, n_i)  # Exposed to at least 2 CAs
     v_death    <- rep(0, n_i)  # Death
+    v_time     <- rep(1, n_i)  # Time (for extracting the first transition probability from the K-M curves)
     
-    
-    df_X       <- data.frame(ID = 1:n_i, Age = v_age, Age_cl = v_age, Age_start = v_age, Sex = v_Sex, 
+    df_X       <- data.frame(ID = 1:n_i, Age = v_age, Age_cl = v_age, Age_start = v_age, Sex = v_Sex, time = v_time,
                              curTrt = v_Trt, Line = v_Line, 
                              disc_AAD = v_disc_AAD, 
                              CT_CA = v_CT_CA, PP_CA = v_PP_CA, VC_CA = v_VC_CA, 
                              TH = v_TH, AAD_exp = v_AAD_exp, CA_exp_1 = v_CA_exp_1, CA_exp_2 = v_CA_exp_2, 
                              death = v_death)
-    
     return(df_X)
   })
 }
@@ -337,19 +336,25 @@ Probs <- function(l_params_all, M_t, df_X, t) {
     # Recurrence rates at time t
     p_SFAF_SAF                                                                 <- NULL
     
-    p_SFAF_SAF[df_X$curTrt == "AAD" & df_X$AAD_exp == 0 & df_X$CA_exp_1 == 0]  <- ifelse(p_SFAF_CA_SAF_L1[t]*RR_nai     >1, 1, p_SFAF_CA_SAF_L1[t]*RR_nai    )
-    p_SFAF_SAF[df_X$curTrt == "AAD" & df_X$AAD_exp == 1 & df_X$CA_exp_1 == 0]  <- ifelse(p_SFAF_CA_SAF_L1[t]*RR_AAD_exp >1, 1, p_SFAF_CA_SAF_L1[t]*RR_AAD_exp)
-    p_SFAF_SAF[df_X$curTrt == "AAD" & df_X$AAD_exp == 0 & df_X$CA_exp_1 == 1]  <- ifelse(p_SFAF_CA_SAF_L2[t]*RR_CA_exp  >1, 1, p_SFAF_CA_SAF_L2[t]*RR_CA_exp )
-    p_SFAF_SAF[df_X$curTrt == "AAD" & df_X$AAD_exp == 1 & df_X$CA_exp_1 == 1]  <- ifelse(p_SFAF_CA_SAF_L2[t]*RR_CA_exp  >1, 1, p_SFAF_CA_SAF_L2[t]*RR_CA_exp )
-    p_SFAF_SAF[df_X$curTrt == "AAD" & df_X$AAD_exp == 0 & df_X$CA_exp_2 == 1]  <- ifelse(p_SFAF_CA_SAF_L3[t]*RR_CA_exp  >1, 1, p_SFAF_CA_SAF_L3[t]*RR_CA_exp )
-    p_SFAF_SAF[df_X$curTrt == "AAD" & df_X$AAD_exp == 1 & df_X$CA_exp_2 == 1]  <- ifelse(p_SFAF_CA_SAF_L3[t]*RR_CA_exp  >1, 1, p_SFAF_CA_SAF_L3[t]*RR_CA_exp )
+    p_SFAF_SAF[df_X$curTrt == "AAD" & df_X$AAD_exp == 0 & df_X$CA_exp_1 == 0]  <- ifelse(p_SFAF_CA_SAF_L1[df_X$time[df_X$curTrt == "AAD" & df_X$AAD_exp == 0 & df_X$CA_exp_1 == 0]]*RR_nai     >1, 1, 
+                                                                                         p_SFAF_CA_SAF_L1[df_X$time[df_X$curTrt == "AAD" & df_X$AAD_exp == 0 & df_X$CA_exp_1 == 0]]*RR_nai    )
+    p_SFAF_SAF[df_X$curTrt == "AAD" & df_X$AAD_exp == 1 & df_X$CA_exp_1 == 0]  <- ifelse(p_SFAF_CA_SAF_L1[df_X$time[df_X$curTrt == "AAD" & df_X$AAD_exp == 1 & df_X$CA_exp_1 == 0]]*RR_AAD_exp >1, 1, 
+                                                                                         p_SFAF_CA_SAF_L1[df_X$time[df_X$curTrt == "AAD" & df_X$AAD_exp == 1 & df_X$CA_exp_1 == 0]]*RR_AAD_exp)
+    p_SFAF_SAF[df_X$curTrt == "AAD" & df_X$AAD_exp == 0 & df_X$CA_exp_1 == 1]  <- ifelse(p_SFAF_CA_SAF_L2[df_X$time[df_X$curTrt == "AAD" & df_X$AAD_exp == 0 & df_X$CA_exp_1 == 1]]*RR_CA_exp  >1, 1, 
+                                                                                         p_SFAF_CA_SAF_L2[df_X$time[df_X$curTrt == "AAD" & df_X$AAD_exp == 0 & df_X$CA_exp_1 == 1]]*RR_CA_exp )
+    p_SFAF_SAF[df_X$curTrt == "AAD" & df_X$AAD_exp == 1 & df_X$CA_exp_1 == 1]  <- ifelse(p_SFAF_CA_SAF_L2[df_X$time[df_X$curTrt == "AAD" & df_X$AAD_exp == 1 & df_X$CA_exp_1 == 1]]*RR_CA_exp  >1, 1, 
+                                                                                         p_SFAF_CA_SAF_L2[df_X$time[df_X$curTrt == "AAD" & df_X$AAD_exp == 1 & df_X$CA_exp_1 == 1]]*RR_CA_exp )
+    p_SFAF_SAF[df_X$curTrt == "AAD" & df_X$AAD_exp == 0 & df_X$CA_exp_2 == 1]  <- ifelse(p_SFAF_CA_SAF_L3[df_X$time[df_X$curTrt == "AAD" & df_X$AAD_exp == 0 & df_X$CA_exp_2 == 1]]*RR_CA_exp  >1, 1, 
+                                                                                         p_SFAF_CA_SAF_L3[df_X$time[df_X$curTrt == "AAD" & df_X$AAD_exp == 0 & df_X$CA_exp_2 == 1]]*RR_CA_exp )
+    p_SFAF_SAF[df_X$curTrt == "AAD" & df_X$AAD_exp == 1 & df_X$CA_exp_2 == 1]  <- ifelse(p_SFAF_CA_SAF_L3[df_X$time[df_X$curTrt == "AAD" & df_X$AAD_exp == 1 & df_X$CA_exp_2 == 1]]*RR_CA_exp  >1, 1, 
+                                                                                         p_SFAF_CA_SAF_L3[df_X$time[df_X$curTrt == "AAD" & df_X$AAD_exp == 1 & df_X$CA_exp_2 == 1]]*RR_CA_exp )
     
-    p_SFAF_SAF[df_X$curTrt == "CA" & df_X$AAD_exp == 0 & df_X$CA_exp_1 == 0]  <- p_SFAF_CA_SAF_L1[t]
-    p_SFAF_SAF[df_X$curTrt == "CA" & df_X$AAD_exp == 1 & df_X$CA_exp_1 == 0]  <- p_SFAF_CA_SAF_L1[t]
-    p_SFAF_SAF[df_X$curTrt == "CA" & df_X$AAD_exp == 0 & df_X$CA_exp_1 == 1]  <- p_SFAF_CA_SAF_L2[t]
-    p_SFAF_SAF[df_X$curTrt == "CA" & df_X$AAD_exp == 1 & df_X$CA_exp_1 == 1]  <- p_SFAF_CA_SAF_L2[t]
-    p_SFAF_SAF[df_X$curTrt == "CA" & df_X$AAD_exp == 0 & df_X$CA_exp_2 == 1]  <- p_SFAF_CA_SAF_L3[t]
-    p_SFAF_SAF[df_X$curTrt == "CA" & df_X$AAD_exp == 1 & df_X$CA_exp_2 == 1]  <- p_SFAF_CA_SAF_L3[t]
+    p_SFAF_SAF[df_X$curTrt == "CA" & df_X$AAD_exp == 0 & df_X$CA_exp_1 == 0]  <- p_SFAF_CA_SAF_L1[df_X$time[df_X$curTrt == "CA" & df_X$AAD_exp == 0 & df_X$CA_exp_1 == 0]]
+    p_SFAF_SAF[df_X$curTrt == "CA" & df_X$AAD_exp == 1 & df_X$CA_exp_1 == 0]  <- p_SFAF_CA_SAF_L1[df_X$time[df_X$curTrt == "CA" & df_X$AAD_exp == 1 & df_X$CA_exp_1 == 0]]
+    p_SFAF_SAF[df_X$curTrt == "CA" & df_X$AAD_exp == 0 & df_X$CA_exp_1 == 1]  <- p_SFAF_CA_SAF_L2[df_X$time[df_X$curTrt == "CA" & df_X$AAD_exp == 0 & df_X$CA_exp_1 == 1]]
+    p_SFAF_SAF[df_X$curTrt == "CA" & df_X$AAD_exp == 1 & df_X$CA_exp_1 == 1]  <- p_SFAF_CA_SAF_L2[df_X$time[df_X$curTrt == "CA" & df_X$AAD_exp == 1 & df_X$CA_exp_1 == 1]]
+    p_SFAF_SAF[df_X$curTrt == "CA" & df_X$AAD_exp == 0 & df_X$CA_exp_2 == 1]  <- p_SFAF_CA_SAF_L3[df_X$time[df_X$curTrt == "CA" & df_X$AAD_exp == 0 & df_X$CA_exp_2 == 1]]
+    p_SFAF_SAF[df_X$curTrt == "CA" & df_X$AAD_exp == 1 & df_X$CA_exp_2 == 1]  <- p_SFAF_CA_SAF_L3[df_X$time[df_X$curTrt == "CA" & df_X$AAD_exp == 1 & df_X$CA_exp_2 == 1]]
     
     p_SFAF_SAF[df_X$curTrt == "no-treatment"]                             <- 1-p_D[df_X$curTrt == "no-treatment"] # get symptoms when no rhythm control treatment
     
@@ -700,6 +705,9 @@ MicroSim <- function(l_params, n_i, df_X, TRT1 = TRT1, TRT2 = TRT2, TRT3 = TRT3,
       
       # Calculate QALYs per individual during cycle t + 1
       m_E[, t + 1]  <- Effs(l_params_all, m_M[, t + 1], df_X, t, cl = cl) 
+      
+      # Update time on treatment (used in Probs)    
+      df_X$time <- ifelse( m_L[ , t] !=  m_L[ , t + 1], 1, df_X$time + 1) # If previous line was a different treatment, restart at 1   
       
       # Display simulation progress
       if(t/(n_t/10) == round(t/(n_t/10), 0)) { # display progress every 10%
